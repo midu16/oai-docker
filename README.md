@@ -10,3 +10,4 @@ Docker-compose file for running OpenAirInterface on docker. The included compone
 
 - phpmyadmin
 
+docker-compose up -d 
