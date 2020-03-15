@@ -29,6 +29,19 @@ services:
       - /dev/bus/usb/:/dev/bus/usb/
     networks:
       - oai
+    
+  flexran:
+    image: mosaic5gecosys/flexran:0.1
+    restart: unless-stopped
+    container_name: flexran
+    hostname: flexran
+    privileged: true
+    depends_on:
+      - "flexran"
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /lib/modules:/lib/modules:ro
+    networks: 
+      - oai
 
   mysql:
     image: mysql:5.6
@@ -46,6 +59,8 @@ services:
     image: phpmyadmin/phpmyadmin:latest
     restart: unless-stopped
     container_name: phpmyadmin
+    depends_on: 
+      - "mysql"
     ports: #Expose port to host network
       - 8080:80
     environment: 
