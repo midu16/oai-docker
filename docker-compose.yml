@@ -41,6 +41,18 @@ services:
     networks:
       - oai
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: unless-stopped
+    container_name: phpmyadmin
+    ports: #Expose port to host network
+      - 8080:80
+    environment: 
+      - MYSQL_USER=root
+      - MYSQL__PASSWORD=linux
+    networks:
+      - oai
+
 networks: # Define our network here
   oai:
     driver: bridge
