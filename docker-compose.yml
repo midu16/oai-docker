@@ -48,8 +48,8 @@ services:
     ports: #Expose port to host network
       - 8080:80
     environment: 
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=linux
+      - PMA_USER=root
+      - PMA_PASSWORD=linux
     networks:
       - oai
 
