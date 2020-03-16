@@ -1,7 +1,7 @@
 # Description
 
 Docker-compose file for running OpenAirInterface on docker. The included componets are as following:
-
+```
 - oai.ran
 
 - oai.cn
@@ -9,11 +9,17 @@ Docker-compose file for running OpenAirInterface on docker. The included compone
 - mysql
 
 - phpmyadmin
-
-$ $WORKINGDIR
+```
+In order to deply all the dockers for the openairinterface, please follow the following commands:
+```
+$ cd $PWD/oai-docker/openairinterface
 $ docker-compose up -d 
-
-
+```
+In order to deploy all the dockers for the devopstools, please follow the following commands:
+```
+$ cd $PWD/oai-docker/devopstools
+$ docker-compose up -d 
+```
 
 Documentation: 
 
