@@ -1,0 +1,69 @@
+---
+# gather the facts
+- name: Collect only facts returned by facter
+  setup:
+    gather_subset:
+      - '!all'
+      - '!any'
+      - facter
+
+# check if the host is virtual or physical
+- name: Debug the ansible_virtualization_role
+  debug:
+    msg: This is a Virtual Host
+  when: ansible_virtualization_role == 'guest'
+  ignore_errors: yes
+
+- name: Debug the ansible_virtualization_role
+  debug:
+    msg: This is a Physical Host
+  when: ansible_virtualization_role == 'host'
+  ignore_errors: yes
+
+# check the type of Ubuntu 16.04 18.04 or 19.04
+- name: Check OS Version via /etc/issue
+  tasks:
+    - name: cat /etc/issue
+    shell: cat /etc/issue | awk '{printf $2}'
+    register: etc_issue
+    - debug: msg="{{etc_issue.stdout_lines}}"
+
+# install the docker
+- name: install docker for Ubuntu 16.04
+  shell: 
+
+
+- name: Check docker.service status
+  shell: sudo systemctl status docker
+  args:
+    executable: /bin/bash
+
+# install the docker-compose
+- name: install docker-compose for Ubuntu 16.04
+  shell: |
+    sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+  args:
+    executable: /bin/bash
+    when: ( etc_issue.stdout_lines == '16.04.6' and ansible_architecture == 'x86_64')
+
+- name: install docker-compose for Ubuntu 16.04
+  shell: |
+    sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+  args:
+    executable: /bin/bash
+    when: ( etc_issue.stdout_lines == '18.04.4' and ansible_architecture == 'x86_64')  
+
+# docker-compose files copy to the destination host
+- name: Copy the openairinterface docker-compose files
+  copy:
+    when: oai_install == 'true'
+
+- name: Copy the DevOps docker-compose files
+  copy:
+    when: devops_install == 'true'
+
+# https://docs.ansible.com/ansible/latest/modules/docker_compose_module.htmls
+# docker-compose up -d run
+- name: Run the 

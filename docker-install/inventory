@@ -1,0 +1,3 @@
+[docker-install]
+
+openairinterface	ansible_host="192.168.1.80"	oai_install="true"	devops_install="true"
