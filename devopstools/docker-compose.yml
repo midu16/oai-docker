@@ -1,4 +1,4 @@
-version: '1'
+version: '2'
 
 services:
   snort: # Domain name of container
@@ -28,8 +28,6 @@ services:
     container_name: logstash
     hostname: logstash
     privileged: true
-    depends_on:
-      - "logstash"
     networks: 
       - devops
 
