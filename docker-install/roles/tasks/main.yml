@@ -188,3 +188,11 @@
 
 
 # creating the telegraf-docker.service systemd
+- name: Copy the telegraf-docker.service files
+  copy:
+    src: "{ role_path }/files/systemd/telegraf-docker.service"
+    dest: /etc/systemd/system
+    owner: root
+    group: root
+    mode: '0640'
+    when: telegraf_install == 'true'
