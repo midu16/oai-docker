@@ -55,15 +55,136 @@
     executable: /bin/bash
     when: ( etc_issue.stdout_lines == '18.04.4' and ansible_architecture == 'x86_64')  
 
+# create /tmp/openairinerface
+- name: create /tmp/openairinterface
+  file:
+    path: /tmp/openairinterface
+    state: directory
+
 # docker-compose files copy to the destination host
 - name: Copy the openairinterface docker-compose files
   copy:
+    src: "{ role_path }/files/openairinterface/docker-compose.yml"
+    dest: /tmp/openairinterface
+    owner: root
+    group: root
+    mode: '0640'
     when: oai_install == 'true'
 
+# create /tmp/devopstools
+- name: create /tmp/devopstools
+  file:
+    path: /tmp/devopstools
+    state: directory
+
+# docker-compose files copy to the destination host
 - name: Copy the DevOps docker-compose files
   copy:
+    src: "{ role_path }/files/devopstools/docker-compose.yml"
+    dest: /tmp/devopstools
+    owner: root
+    group: root
+    mode: '0640'
     when: devops_install == 'true'
 
 # https://docs.ansible.com/ansible/latest/modules/docker_compose_module.htmls
-# docker-compose up -d run
-- name: Run the 
+# cd /tmp/openairinterface; docker-compose up -d run
+- name: Run the docker-compose
+  shell: |
+    cd /tmp/openairinterface; 
+    docker-compose up -d run
+  args:
+    executable: /bin/bash
+    when: ( oai_install == 'true')  
+
+# cd /tmp/devopstools; docker-compose up -d run
+- name: Run the docker-compose
+  shell: |
+    cd /tmp/devopstools; 
+    docker-compose up -d run
+  args:
+    executable: /bin/bash
+    when: ( devops_install == 'true')  
+
+# Monitoring installation only if required in the inventory file
+# preconfiguration for installing grafana
+- name: Install the prerequires for the monitoring systemctl
+  copy: 
+    src: "{{ role_path }}/files/Ubuntu16.04-monitoring.sh"
+    dest: /tmp/
+    owner: root
+    group: root
+    mode: '0640'
+    when: influxdb_install == 'true' and telegraf_install == 'true' and grafana_install == 'true' 
+
+# installing grafana
+- name: Ensure a list of packages installed
+  apt:
+    name: "{{ packages }}"
+    state: installed
+    vars:
+    packages:
+    - grafana
+
+# sudo systemctl start grafana-server 
+- name: systemctl start grafana-server
+  shell: |
+    sudo systemctl start grafana-server
+  args:
+    executable: /bin/bash
+    when: ( grafana_install == 'true')  
+
+#sudo systemctl status grafana-server
+- name: systemctl status grafana-server
+  shell: |
+    sudo systemctl status grafana-server
+  args:
+    executable: /bin/bash
+    when: ( grafana_install == 'true')  
+
+# sudo systemctl enable grafana-server
+- name: systemctl enable grafana-server
+  shell: |
+    sudo systemctl enable grafana-server
+  args:
+    executable: /bin/bash
+    when: ( grafana_install == 'true')  
+
+- name: Install influxdb
+  apt:
+    name: "{{ packages }}"
+    state: installed
+    vars:
+      packages:
+        - influxdb
+
+# telegraf installation
+- name: Install telegraf
+  apt:
+    name: "{{ packages }}"
+    state: installed
+    vars:
+      packages:
+        - telegraf
+
+#sudo apt-get -y install telegraf
+#sudo systemctl enable --now telegraf
+- name: sudo systemctl enable --now telegraf
+  shell: |
+    sudo systemctl enable --now telegraf
+  args:
+    executable: /bin/bash
+    when: ( telegraf_install == 'true')  
+  
+#systemctl status telegraf
+- name: sudo systemctl status telegraf
+  shell: |
+    sudo systemctl status telegraf
+  args:
+    executable: /bin/bash
+    when: ( telegraf_install == 'true')  
+
+# copy the basic configuration of the /etc/telegraf/telegraf.conf
+
+
+# creating the telegraf-docker.service systemd
