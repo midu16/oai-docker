@@ -24,12 +24,14 @@
 - name: Check OS Version cat /etc/issue
   shell: cat /etc/issue | awk '{printf $2}'
   register: etc_issue
-- debug: msg="{{etc_issue.stdout_lines}}"
+
+- name: Debug the stdout of the OS Version
+  debug: 
+    msg: "{{etc_issue.stdout_lines}}"
 
 # install the docker
 - name: install docker for Ubuntu 16.04
   shell: 
-
 
 - name: Check docker.service status
   shell: sudo systemctl status docker
@@ -119,7 +121,7 @@
 - name: Ensure a list of packages installed
   apt:
     name: "{{ packages }}"
-    state: installed
+    state: present
     vars:
     packages:
     - grafana
@@ -151,7 +153,7 @@
 - name: Install influxdb
   apt:
     name: "{{ packages }}"
-    state: installed
+    state: present
     vars:
       packages:
         - influxdb
@@ -160,7 +162,7 @@
 - name: Install telegraf
   apt:
     name: "{{ packages }}"
-    state: installed
+    state: present
     vars:
       packages:
         - telegraf
