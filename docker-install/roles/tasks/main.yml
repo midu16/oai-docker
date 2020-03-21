@@ -53,7 +53,7 @@
     sudo chmod +x /usr/local/bin/docker-compose
   args:
     executable: /bin/bash
-    when: ( etc_issue.stdout_lines == '18.04.4' and ansible_architecture == 'x86_64')  
+    when: (etc_issue.stdout_lines == '18.04.4' and ansible_architecture == 'x86_64')  
 
 # create /tmp/openairinerface
 - name: create /tmp/openairinterface
@@ -95,7 +95,7 @@
     docker-compose up -d run
   args:
     executable: /bin/bash
-    when: ( oai_install == 'true')  
+    when: (oai_install == 'true')  
 
 # cd /tmp/devopstools; docker-compose up -d run
 - name: Run the docker-compose
@@ -104,7 +104,7 @@
     docker-compose up -d run
   args:
     executable: /bin/bash
-    when: ( devops_install == 'true')  
+    when: (devops_install == 'true')  
 
 # Monitoring installation only if required in the inventory file
 # preconfiguration for installing grafana
