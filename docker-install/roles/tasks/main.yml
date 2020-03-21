@@ -21,12 +21,10 @@
   ignore_errors: yes
 
 # check the type of Ubuntu 16.04 18.04 or 19.04
-- name: Check OS Version via /etc/issue
-  tasks:
-    - name: cat /etc/issue
-    shell: cat /etc/issue | awk '{printf $2}'
-    register: etc_issue
-    - debug: msg="{{etc_issue.stdout_lines}}"
+- name: Check OS Version cat /etc/issue
+  shell: cat /etc/issue | awk '{printf $2}'
+  register: etc_issue
+- debug: msg="{{etc_issue.stdout_lines}}"
 
 # install the docker
 - name: install docker for Ubuntu 16.04
@@ -41,15 +39,15 @@
 # install the docker-compose
 - name: install docker-compose for Ubuntu 16.04
   shell: |
-    sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose;
     sudo chmod +x /usr/local/bin/docker-compose
   args:
     executable: /bin/bash
-    when: ( etc_issue.stdout_lines == '16.04.6' and ansible_architecture == 'x86_64')
+    when: (etc_issue.stdout_lines == '16.04.6' and ansible_architecture == 'x86_64')
 
 - name: install docker-compose for Ubuntu 16.04
   shell: |
-    sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose;
     sudo chmod +x /usr/local/bin/docker-compose
   args:
     executable: /bin/bash
@@ -132,7 +130,7 @@
     sudo systemctl start grafana-server
   args:
     executable: /bin/bash
-    when: ( grafana_install == 'true')  
+    when: (grafana_install == 'true')  
 
 #sudo systemctl status grafana-server
 - name: systemctl status grafana-server
@@ -140,7 +138,7 @@
     sudo systemctl status grafana-server
   args:
     executable: /bin/bash
-    when: ( grafana_install == 'true')  
+    when: (grafana_install == 'true')  
 
 # sudo systemctl enable grafana-server
 - name: systemctl enable grafana-server
@@ -148,7 +146,7 @@
     sudo systemctl enable grafana-server
   args:
     executable: /bin/bash
-    when: ( grafana_install == 'true')  
+    when: (grafana_install == 'true')  
 
 - name: Install influxdb
   apt:
@@ -174,7 +172,7 @@
     sudo systemctl enable --now telegraf
   args:
     executable: /bin/bash
-    when: ( telegraf_install == 'true')  
+    when: (telegraf_install == 'true')  
   
 #systemctl status telegraf
 - name: sudo systemctl status telegraf
@@ -182,10 +180,25 @@
     sudo systemctl status telegraf
   args:
     executable: /bin/bash
-    when: ( telegraf_install == 'true')  
+    when: (telegraf_install == 'true')  
+
+# create a local backup of the telegraf.conf
+- name: local backup for telegraf.conf
+  shell: |
+    sudo cp /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.bkp
+  args:
+    executable: /bin/bash
+    when: (telegraf_install == 'true')
 
 # copy the basic configuration of the /etc/telegraf/telegraf.conf
-
+- name: Copy the configuration of /etc/telegraf/telegraf.conf
+  copy:
+    src: "{{ role_path }}/files/telegraf-config/telegraf.conf"
+    dest: /etc/telegraf/telegraf.conf
+    owner: root
+    group: root
+    mode: '0640'
+    when: telegraf_install == 'true'
 
 # creating the telegraf-docker.service systemd
 - name: Copy the telegraf-docker.service files
